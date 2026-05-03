@@ -56,10 +56,10 @@ export default function AuthPage() {
   if (user && !isAdmin && profile !== undefined) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md animate-slide-up">
+        <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-neutral-900 mb-2">The <span className="text-primary-600">Daily</span> Herald</h1>
-            <p className="text-neutral-500">Welcome, {profile.full_name || user.email}</p>
+            <p className="text-neutral-500">Welcome, {profile?.full_name || user?.email}</p>
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-8 space-y-5">
             <div className="text-center">
@@ -79,7 +79,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md animate-slide-up">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-neutral-900 mb-2">The <span className="text-primary-600">Daily</span> Herald</h1>
           <p className="text-neutral-500">{isSignUp ? 'Create your account' : 'Sign in to your account'}</p>
