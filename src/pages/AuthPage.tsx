@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -12,8 +12,13 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [promoting, setPromoting] = useState(false)
-  const { signIn, signUp, user, isAdmin, profile } = useAuth()
+  const { signIn, signUp, user, isAdmin, profile, loading } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (loading) return
+    if (user && isAdmin) navigate('/admin', { replace: true })
+  }, [user, loading, isAdmin, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,11 +27,9 @@ export default function AuthPage() {
     if (isSignUp) {
       const { error } = await signUp(email, password, fullName)
       if (error) setError(error)
-      else navigate('/')
     } else {
       const { error } = await signIn(email, password)
       if (error) setError(error)
-      else navigate('/')
     }
     setSubmitting(false)
   }
@@ -45,7 +48,7 @@ export default function AuthPage() {
       })
       const result = await res.json()
       if (result.error) setError(result.error)
-      else { await supabase.auth.refreshSession(); navigate('/admin') }
+      else await supabase.auth.refreshSession()
     } catch { setError('Failed to claim admin role') }
     setPromoting(false)
   }
