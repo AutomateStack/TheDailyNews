@@ -1,11 +1,10 @@
 # Runs every day at 7:00 AM UTC (12:30 PM IST).
-# Fetches the latest news, rewrites each article with OpenAI,
-# attaches an Unsplash image, and publishes to the Supabase database.
+# Pulls live RSS feeds, rewrites each article with OpenAI,
+# attaches an Unsplash photo, and publishes to Supabase.
 #
 # ─── GitHub Secrets required ────────────────────────────────────────────────
 #   SUPABASE_URL           https://shxnkkhsuuotnfewdvnt.supabase.co
 #   SUPABASE_SERVICE_KEY   Project Settings → API → service_role key
-#   NEWSAPI_KEY            newsapi.org → Register → copy API key
 #   OPENAI_API_KEY         platform.openai.com → API keys
 #   UNSPLASH_ACCESS_KEY    unsplash.com/developers → New Application → Access Key
 # ────────────────────────────────────────────────────────────────────────────
@@ -43,7 +42,6 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: node daily-news-bot.mjs
