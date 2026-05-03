@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
 import { Shield } from 'lucide-react'
 
 export default function AuthPage() {
@@ -13,7 +12,7 @@ export default function AuthPage() {
   const [submitting, setSubmitting] = useState(false)
   const [promoting, setPromoting] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
-  const { signIn, signUp, user, isAdmin, profile, loading } = useAuth()
+  const { signIn, signUp, user, isAdmin, profile, loading, refreshProfile } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -24,11 +23,12 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccessMsg('')
     setSubmitting(true)
     if (isSignUp) {
       const { error } = await signUp(email, password, fullName)
       if (error) setError(error)
-      else setSuccessMsg('Account created! Check your email for a confirmation link, then sign in.')
+      else setSuccessMsg('Account created! Signing you in…')
     } else {
       const { error } = await signIn(email, password)
       if (error) setError(error)
@@ -37,22 +37,18 @@ export default function AuthPage() {
   }
 
   const handleClaimAdmin = async () => {
-    if (!user) return
     setPromoting(true)
     setError('')
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const token = session?.access_token
-      if (!token) { setError('Not authenticated'); setPromoting(false); return }
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/promote-admin`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-      })
-      const result = await res.json()
-      if (result.error) setError(result.error)
-      else await supabase.auth.refreshSession()
-    } catch { setError('Failed to claim admin role') }
-    setPromoting(false)
+      const { data, error } = await supabase_rpc('claim_admin_role')
+      if (error) { setError(error); return }
+      if (!data?.success) { setError(data?.error || 'Failed to claim admin role'); return }
+      await refreshProfile()
+    } catch {
+      setError('Failed to claim admin role. Make sure the database function is set up.')
+    } finally {
+      setPromoting(false)
+    }
   }
 
   if (user && !isAdmin && profile !== undefined) {
@@ -70,7 +66,7 @@ export default function AuthPage() {
               <p className="text-sm text-neutral-500 mb-6">No admin exists yet. Claim the admin role to manage articles, categories, and the entire site.</p>
               {error && <div className="mb-4 p-3 bg-accent-50 border border-accent-200 rounded-lg text-sm text-accent-700 text-left">{error}</div>}
               <button onClick={handleClaimAdmin} disabled={promoting} className="w-full py-2.5 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50">
-                {promoting ? 'Claiming...' : 'Claim Admin Role'}
+                {promoting ? 'Claiming…' : 'Claim Admin Role'}
               </button>
             </div>
           </div>
@@ -104,11 +100,11 @@ export default function AuthPage() {
           {error && <div className="p-3 bg-accent-50 border border-accent-200 rounded-lg text-sm text-accent-700">{error}</div>}
           {successMsg && <div className="p-3 bg-success-50 border border-success-500 rounded-lg text-sm text-success-600">{successMsg}</div>}
           <button type="submit" disabled={submitting} className="w-full py-2.5 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            {submitting ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
+            {submitting ? 'Please wait…' : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
           <p className="text-center text-sm text-neutral-500">
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button type="button" onClick={() => { setIsSignUp(!isSignUp); setError('') }} className="text-primary-600 hover:text-primary-800 font-medium">
+            <button type="button" onClick={() => { setIsSignUp(!isSignUp); setError(''); setSuccessMsg('') }} className="text-primary-600 hover:text-primary-800 font-medium">
               {isSignUp ? 'Sign In' : 'Sign Up'}
             </button>
           </p>
@@ -116,4 +112,11 @@ export default function AuthPage() {
       </div>
     </div>
   )
+}
+
+// Thin wrapper around supabase.rpc to avoid importing supabase directly
+async function supabase_rpc(fn: string) {
+  const { supabase } = await import('../lib/supabase')
+  const { data, error } = await supabase.rpc(fn)
+  return { data, error: error?.message ?? null }
 }

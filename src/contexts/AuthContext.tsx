@@ -12,6 +12,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -25,6 +26,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
     setProfile(data)
+  }
+
+  const refreshProfile = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) await fetchProfile(session.user.id)
   }
 
   useEffect(() => {
@@ -62,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, isAdmin: profile?.role === 'admin', signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, isAdmin: profile?.role === 'admin', signIn, signUp, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   )
