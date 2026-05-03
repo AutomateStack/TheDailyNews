@@ -1,0 +1,13 @@
+{
+  "name": "thedailynews-bot",
+  "version": "1.0.0",
+  "description": "Daily news automation bot for TheDailyNews",
+  "type": "module",
+  "scripts": {
+    "start": "node daily-news-bot.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.1",
+    "openai": "^4.100.0"
+  }
+}
