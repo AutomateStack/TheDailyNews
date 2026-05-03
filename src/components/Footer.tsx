@@ -44,7 +44,7 @@ export default function Footer() {
               <li><span className="text-sm text-neutral-400">About Us</span></li>
               <li><span className="text-sm text-neutral-400">Contact</span></li>
               <li><span className="text-sm text-neutral-400">Careers</span></li>
-              <li><span className="text-sm text-neutral-400">Privacy Policy</span></li>
+              <li><Link to="/privacy-policy" className="text-sm text-neutral-400 hover:text-white transition-colors">Privacy Policy</Link></li>
             </ul>
           </div>
         </div>

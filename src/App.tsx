@@ -12,6 +12,7 @@ import DashboardPage from './pages/admin/DashboardPage'
 import ArticlesPage from './pages/admin/ArticlesPage'
 import ArticleEditorPage from './pages/admin/ArticleEditorPage'
 import CategoriesPage from './pages/admin/CategoriesPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -31,6 +32,7 @@ function AppRoutes() {
       <Route path="/article/:slug" element={<PublicLayout><ArticlePage /></PublicLayout>} />
       <Route path="/search" element={<PublicLayout><SearchPage /></PublicLayout>} />
       <Route path="/auth" element={<PublicLayout><AuthPage /></PublicLayout>} />
+      <Route path="/privacy-policy" element={<PublicLayout><PrivacyPolicyPage /></PublicLayout>} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<DashboardPage />} />
         <Route path="articles" element={<ArticlesPage />} />

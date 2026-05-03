@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import type { Article } from '../types/database'
 import { format } from 'date-fns'
 import { ArrowLeft, Clock, User, Share2, Bookmark } from 'lucide-react'
+import AdBanner from '../components/AdBanner'
 
 export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>()
@@ -62,17 +63,33 @@ export default function ArticlePage() {
         </div>
       </header>
 
-      {article.featured_image_url && <figure className="mb-10"><img src={article.featured_image_url} alt={article.title} className="w-full rounded-xl shadow-md" /></figure>}
+      {article.featured_image_url && <figure className="mb-6"><img src={article.featured_image_url} alt={article.title} className="w-full rounded-xl shadow-md" /></figure>}
 
-      <div className="article-content mb-12">
-        {article.content.split('\n').map((paragraph, i) => {
-          if (!paragraph.trim()) return null
-          if (paragraph.startsWith('## ')) return <h2 key={i}>{paragraph.replace('## ', '')}</h2>
-          if (paragraph.startsWith('### ')) return <h3 key={i}>{paragraph.replace('### ', '')}</h3>
-          if (paragraph.startsWith('> ')) return <blockquote key={i}><p>{paragraph.replace('> ', '')}</p></blockquote>
-          return <p key={i}>{paragraph}</p>
-        })}
+      {/* Ad below featured image */}
+      <AdBanner slot="REPLACE_ARTICLE_TOP_SLOT" className="mb-10" />
+
+      <div className="article-content mb-8">
+        {(() => {
+          let count = 0
+          return article.content.split('\n').flatMap((paragraph, i) => {
+            if (!paragraph.trim()) return []
+            let el
+            if (paragraph.startsWith('## ')) el = <h2 key={i}>{paragraph.replace('## ', '')}</h2>
+            else if (paragraph.startsWith('### ')) el = <h3 key={i}>{paragraph.replace('### ', '')}</h3>
+            else if (paragraph.startsWith('> ')) el = <blockquote key={i}><p>{paragraph.replace('> ', '')}</p></blockquote>
+            else el = <p key={i}>{paragraph}</p>
+            count++
+            // Inject mid-article ad after the 4th rendered block
+            if (count === 4) {
+              return [el, <AdBanner key="mid-ad" slot="REPLACE_ARTICLE_MID_SLOT" className="my-8" />]
+            }
+            return [el]
+          })
+        })()}
       </div>
+
+      {/* Ad after article body */}
+      <AdBanner slot="REPLACE_ARTICLE_BOTTOM_SLOT" className="mb-12" />
 
       {relatedArticles.length > 0 && (
         <section className="border-t border-neutral-200 pt-10">

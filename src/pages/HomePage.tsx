@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Article, Category } from '../types/database'
 import ArticleCard from '../components/ArticleCard'
+import AdBanner from '../components/AdBanner'
 import { Zap } from 'lucide-react'
 
 export default function HomePage() {
@@ -61,6 +62,9 @@ export default function HomePage() {
 
       {heroArticle && <section className="mt-6"><ArticleCard article={heroArticle} variant="hero" /></section>}
 
+      {/* Ad below hero */}
+      <AdBanner slot="REPLACE_HOME_TOP_SLOT" className="mt-6" />
+
       <section className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2 mb-6">
@@ -81,7 +85,7 @@ export default function HomePage() {
         </aside>
       </section>
 
-      {categories.slice(0, 4).map((cat) => {
+      {categories.slice(0, 4).map((cat, idx) => {
         const catArticles = [...featuredArticles, ...latestArticles].filter(a => a.category_id === cat.id)
         if (catArticles.length === 0) return null
         return (
@@ -96,6 +100,8 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {catArticles.slice(0, 4).map((article) => <ArticleCard key={article.id} article={article} variant="featured" />)}
             </div>
+            {/* Ad after every 2nd category section */}
+            {idx % 2 === 1 && <AdBanner slot="REPLACE_HOME_MID_SLOT" className="mt-10" />}
           </section>
         )
       })}
