@@ -12,6 +12,7 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [promoting, setPromoting] = useState(false)
+  const [successMsg, setSuccessMsg] = useState('')
   const { signIn, signUp, user, isAdmin, profile, loading } = useAuth()
   const navigate = useNavigate()
 
@@ -27,6 +28,7 @@ export default function AuthPage() {
     if (isSignUp) {
       const { error } = await signUp(email, password, fullName)
       if (error) setError(error)
+      else setSuccessMsg('Account created! Check your email for a confirmation link, then sign in.')
     } else {
       const { error } = await signIn(email, password)
       if (error) setError(error)
@@ -100,6 +102,7 @@ export default function AuthPage() {
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-sm" placeholder="Min. 6 characters" minLength={6} required />
           </div>
           {error && <div className="p-3 bg-accent-50 border border-accent-200 rounded-lg text-sm text-accent-700">{error}</div>}
+          {successMsg && <div className="p-3 bg-success-50 border border-success-500 rounded-lg text-sm text-success-600">{successMsg}</div>}
           <button type="submit" disabled={submitting} className="w-full py-2.5 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {submitting ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
