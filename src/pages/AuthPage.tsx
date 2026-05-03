@@ -53,7 +53,7 @@ export default function AuthPage() {
     setPromoting(false)
   }
 
-  if (user && !isAdmin && profile) {
+  if (user && !isAdmin && profile !== undefined) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md animate-slide-up">

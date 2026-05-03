@@ -6,7 +6,7 @@ import type { User, Session } from '@supabase/supabase-js'
 type AuthContextType = {
   user: User | null
   session: Session | null
-  profile: Profile | null
+  profile: Profile | null | undefined
   loading: boolean
   isAdmin: boolean
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profile, setProfile] = useState<Profile | null | undefined>(undefined)
   const [loading, setLoading] = useState(true)
 
   const fetchProfile = async (userId: string) => {

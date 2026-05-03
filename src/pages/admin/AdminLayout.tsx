@@ -5,7 +5,7 @@ import { LayoutDashboard, FileText, FolderOpen, LogOut, ArrowLeft, Shield } from
 export default function AdminLayout() {
   const { isAdmin, loading, signOut, profile, user } = useAuth()
 
-  if (loading || (user && !profile)) return <div className="min-h-screen flex items-center justify-center bg-neutral-50"><div className="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full" /></div>
+  if (loading || (user && profile === undefined)) return <div className="min-h-screen flex items-center justify-center bg-neutral-50"><div className="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full" /></div>
   if (!isAdmin) return <Navigate to="/auth" replace />
 
   const navItems = [
